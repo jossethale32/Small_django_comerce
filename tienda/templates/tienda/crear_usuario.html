@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+<!-- {% load static %} -->
+
+<!-- {% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/estiloscrearusuario.css' %}">
+{% endblock %} -->
+
+{% block content %}
+    <div id="login">
+        {% if messages %}  
+            <ul>   
+                {% for message in messages %}  
+                    <li>{{ message }}</li>  
+                    {% endfor %}  
+            </ul>   
+        {% endif %}  
+        {% if form.errors %}
+            <p> Tienes errores en tu formulario</p>
+        {% endif %}
+        <form action="{% url 'crear_usuario' %}" method="post">
+
+            {% csrf_token %}
+
+            <!-- <h2>Crear Usuario</h2>
+
+            <div class="form-group">
+                <label for="id_username">Nombre de usuario:</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Correo Electronico:</label>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Contraseña:</label>
+                {{ form.password1 }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirmar contraseña:</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="btn-crear-usuario">Crear Usuario</button> -->
+            
+            <!-- <table>   -->
+                {{ form }}  
+                 <!-- <tr>   -->
+                    <!-- <td></td>   -->
+                <input type="submit" name="submit" class="btn btn-secondary" value="Crear Usuario" />
+                <!-- </tr>   -->
+             <!-- </table> -->
+            
+                <!-- <button class="btn-iniciar-sesion" onclick="window.location.href='{% url 'login' %}'">Iniciar Sesión</button> -->
+
+        </form>
+
+    </div>
+{% endblock content%}

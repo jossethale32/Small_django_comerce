@@ -1,0 +1,47 @@
+<!-- tienda/templates/tienda/lista_videojuegos.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="carrito-container">
+    <h1>Lista de Videojuegos</h1>
+    <table class="carrito-table">
+      <thead>
+        <tr>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for videojuego in videojuegos %}
+          <tr>
+            <td>
+              {% if videojuego.imagen %}
+                <img src="{{ videojuego.imagen.url }}" alt="{{ videojuego.titulo }}" style="max-width: 100px; max-height: 100px;">
+              {% endif %}
+            </td>
+            <td>{{ videojuego.titulo }}</td>
+            <td>{{ videojuego.descripcion }}</td>
+            <td>Lps {{ videojuego.precio }}</td>
+            <td>
+              <input type="number" name="cantidad{{ videojuego.id }}" value="1" min="1">
+            </td>
+            <td>
+              <button onclick="window.location.href='{% url 'agregar_al_carrito' videojuego.id %}?cantidad=' + document.getElementsByName('cantidad{{ videojuego.id }}')[0].value" class="realizar-pago-btn">Agregar al carrito</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button onclick="window.location.href='{% url 'ver_carrito' %}'" class="realizar-pago-btn">Ver Carrito</button>
+  </div>
+{% endblock %}

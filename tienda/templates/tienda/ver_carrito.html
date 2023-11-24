@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="carrito-container">
+    <h1>Carrito de Compras</h1>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+      <script>
+        // Si hay mensajes, limpia la página después de un breve período
+        setTimeout(function() {
+          window.location.href = '{% url "ver_carrito" %}';
+        }, 3000);  // 3000 milisegundos (3 segundos), ajusta según sea necesario
+      </script>
+    {% endif %}
+
+    {% if videojuegos_en_carrito %}
+      <table class="carrito-table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for videojuego in videojuegos_en_carrito %}
+            <tr>
+              <td>
+                {% if videojuego.imagen %}
+                  <img src="{{ videojuego.imagen.url }}" alt="{{ videojuego.titulo }}" style="max-width: 100px; max-height: 100px;">
+                {% endif %}
+              </td>
+              <td>
+                <h2>{{ videojuego.titulo }}</h2>
+              </td>
+              <td>
+                <p>Lps {{ videojuego.precio }}</p>
+              </td>
+              <td>
+                <p>{{ videojuego.cantidad_en_carrito }}</p>
+              </td>
+              <td>
+                <form method="post" action="{% url 'eliminar_del_carrito' videojuego.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="videojuego_id" value="{{ videojuego.id }}">
+                  <button type="submit">Eliminar</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <p class="total">Total: Lps {{ videojuegos_en_carrito|total_precio }}</p>
+
+      <form method="post" action="{% url 'procesar_pago' %}">
+        {% csrf_token %}
+        <input type="submit" class="realizar-pago-btn" value="Realizar Pago">
+      </form>
+      
+      <form method="get" action="{% url 'lista_videojuegos' %}">
+        <button type="submit" class="regresar-btn">Regresar a la Lista de Videojuegos</button>
+      </form>
+    {% else %}
+      <p class="total">No hay productos en el carrito.</p>
+      <form method="get" action="{% url 'lista_videojuegos' %}">
+        <button type="submit" class="regresar-btn">Regresar a la Lista de Videojuegos</button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

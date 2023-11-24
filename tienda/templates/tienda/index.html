@@ -1,0 +1,30 @@
+<!-- tienda/templates/tienda/index.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/disenoindex.css' %}">
+<style>
+  body {
+      color: white;
+      background: url("{% static 'images/fondo.png' %}") center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }</style>
+
+{% endblock %}
+
+{% block content %}
+  <div id="index-content">
+    <h1>Bienvenidos a NebulasGaming</h1>
+    <p>Tu sitio preferido </p>
+    <p> para comprar videjuegos.</p>
+
+    <div class="index-buttons">
+      <button onclick="window.location.href='{% url 'lista_videojuegos' %}'">Ver Lista de Videojuegos</button>
+    </div>
+  </div>
+{% endblock %}

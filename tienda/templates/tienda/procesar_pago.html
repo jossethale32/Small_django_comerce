@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="pago-container">
+    <h1>Procesar Pago</h1>
+    <form id="pago-form" method="post" action="{% url 'procesar_pago' %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="numero_tarjeta">Número de Tarjeta:</label>
+        <input type="text" id="numero_tarjeta" name="numero_tarjeta" pattern="\d{1,16}" title="Debe contener entre 1 y 16 dígitos (solo números)" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fecha_vencimiento">Fecha de Vencimiento (MM/YY):</label>
+        <input type="text" id="fecha_vencimiento" name="fecha_vencimiento" pattern="(0[1-9]|1[0-2])/\d{2}" title="Formato válido: MM/YY" required>
+      </div>
+
+      <div class="form-group">
+        <label for="nombre_titular">Nombre del Titular:</label>
+        <input type="text" id="nombre_titular" name="nombre_titular" pattern="[A-Za-z\s]+" title="Solo se permiten letras y espacios" required>
+      </div>
+
+      <div class="form-group">
+        <label for="codigo_seguridad">Código de Seguridad:</label>
+        <input type="text" id="codigo_seguridad" name="codigo_seguridad" pattern="\d{3}" title="Debe contener 3 dígitos (solo números)" required>
+      </div>
+
+      <button type="submit" class="procesar-pago-btn">Procesar Pago</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+  <script>
+    document.getElementById('pago-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var numeroTarjeta = document.getElementById('numero_tarjeta').value;
+      var fechaVencimiento = document.getElementById('fecha_vencimiento').value;
+      var nombreTitular = document.getElementById('nombre_titular').value;
+      var codigoSeguridad = document.getElementById('codigo_seguridad').value;
+
+      // Validación de número de tarjeta
+      if (!/^\d{1,16}$/.test(numeroTarjeta)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Número de tarjeta inválido',
+        });
+        return;
+      }
+
+      // Validación de fecha de vencimiento
+      var fechaActual = new Date();
+      var mesActual = fechaActual.getMonth() + 1;
+      var añoActual = fechaActual.getFullYear() % 100;
+
+      var partesFecha = fechaVencimiento.split('/');
+      var mesTarjeta = parseInt(partesFecha[0], 10);
+      var añoTarjeta = parseInt(partesFecha[1], 10);
+
+      if (añoTarjeta < añoActual || (añoTarjeta === añoActual && mesTarjeta < mesActual)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'La tarjeta está vencida',
+        });
+        return;
+      }
+
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(fechaVencimiento)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Formato de fecha de vencimiento inválido (MM/YY)',
+        });
+        return;
+      }
+
+      if (!/^[A-Za-z\s]+$/.test(nombreTitular)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Nombre del titular inválido',
+        });
+        return;
+      }
+
+      if (!/^\d{3}$/.test(codigoSeguridad)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Código de seguridad inválido',
+        });
+        return;
+      }
+       Swal.fire({
+        icon: 'success',
+        title: '¡Pago realizado con éxito!',
+        showConfirmButton: false,
+        timer: 1500
+      }).then(function () {
+        window.location.href = '{% url "index" %}';
+      });
+    });
+  </script>
+{% endblock %}
