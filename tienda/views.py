@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from .models import Videojuego, Carrito
 from .form import CustomUserCreationForm
 
@@ -71,6 +72,35 @@ def eliminar_del_carrito(request, videojuego_id):
 
     return redirect('ver_carrito')
 
+def eliminar_carrito_pagado(request):
+    carrito = Carrito.objects.filter(usuario=request.user).first()
+    listavid= Videojuego.objects.all()
+
+    for vid in listavid:
+        videojuegoscar = get_object_or_404(Videojuego, id=vid.id)
+        if carrito and videojuegoscar:
+            videojuegoscar.cantidad_en_carrito = 0
+            videojuegoscar.save()
+            carrito.videojuegos.remove(videojuegoscar)
+
+    text = request.POST['text']
+    response = text + ":)"
+    return HttpResponse(response)
+
+    # videojuego_a_eliminar = get_object_or_404(Videojuego, id=videojuego_id)
+
+    # if carrito and videojuego_a_eliminar:
+        # Establecer la cantidad en cero para el videojuego en el carrito
+        # videojuego_a_eliminar.cantidad_en_carrito = 0
+        # videojuego_a_eliminar.save()
+
+        # Eliminar el videojuego del carrito
+        # carrito.videojuegos.remove(videojuego_a_eliminar)
+
+        # messages.success(request, 'Videojuego eliminado del carrito.')
+
+    # return redirect('ver_carrito')
+
 def register(request):  
     if request.method == 'POST':  
         form = CustomUserCreationForm(request.POST)
@@ -110,8 +140,9 @@ def procesar_pago(request):
         if not numero_tarjeta or not fecha_vencimiento or not cvv:
             messages.error(request, 'Por favor, completa todos los campos del formulario de pago.')
             return redirect('procesar_pago')
-
+        eliminar_carrito_pagado(request)
         messages.success(request, '¡Pago realizado con éxito!')
+        
         return redirect('ver_carrito')
     else:
         return render(request, 'tienda/procesar_pago.html')

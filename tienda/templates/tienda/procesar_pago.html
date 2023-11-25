@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% load static %}
+<script type="text/javascript" src="{% static 'jquery-3.5.0.js' %}"></script>
 
 {% block styles %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
@@ -107,6 +108,16 @@
         showConfirmButton: false,
         timer: 1500
       }).then(function () {
+        var text = "borra carrito";
+
+        $.ajax({
+          type: "POST",
+          url: "{{ '../eliminar_del_carrito/' }}",
+          data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: text },
+          success: function callback(response){
+              console.log(response);
+          }
+        });
         window.location.href = '{% url "index" %}';
       });
     });
